@@ -11,3 +11,5 @@ Run server
 ```sh
 node app.js
 ```
+
+### Step 3
