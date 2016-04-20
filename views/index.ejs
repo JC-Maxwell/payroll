@@ -1,11 +1,297 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="nominaApp">
   <head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+	<script src="/js/jquery.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+	<script src="/angular/angular.min.js"></script>
+	<script src="/angular-resource/angular-resource.min.js"></script>
+	<script src="/angular-sanitize/angular-sanitize.min.js"></script>
+	<script src="/javascripts/Nomina.js"></script>
+	<script>
+	  $(document).ready(function(){
+		$("#newNomina").tooltip({
+			title: "<h4>Crear nomina</h4>", 	
+			html: true, 
+		}); 
+		$("#config").tooltip({
+			title: "<h4>Configuración</h4>", 	
+			html: true, 
+		}); 
+		$("#adduser").tooltip({
+			title: "<h4>Crear empleado</h4>", 	
+			html: true, 
+		}); 
+		$("#stadistics").tooltip({
+			title: "<h4>Estadisticas</h4>", 	
+			html: true, 
+		}); 
+		$("#card").tooltip({
+			title: "<h4>Montos</h4>", 	
+			html: true, 
+		}); 
+		$("#empleado").tooltip({
+			title: "<h4>Ver nomina empleado</h4>", 	
+			html: true, 
+		}); 
+		$("#cardEmpleado").tooltip({
+			title: "<h4>Ver percepciones empleado</h4>", 	
+			html: true, 
+		}); 
+		$("#visualizar").tooltip({
+			title: "<h4>Ver empleado</h4>", 	
+			html: true, 
+		}); 
+	});
+
+	</script>
   </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+  <body ng-controller="NominaController">
+	
+<div class="container-fluid">
+    <div class="row" style="border-width:0px; border-style:solid; border-color:black;">
+		<div class="col-md-10 text-left nomiTitle"> 
+			<img src="images/clock.png" width="40" height="40"/>Calculo y timbrado de nomina
+		</div>
+		<div class="col-md-2 text-right">
+		    <img src="images/user.jpg" width="45" height="45"/>
+			<br>
+			Victor
+		</div>
+	</div>
+</div>
+  
+<div class="container-fluid text-center">    
+  <div class="row">
+    <div class="col-sm-3" style="border-width:0px; border-style:solid; border-color:black; padding:0px"">
+	  <table class="tableMenu">
+	    <tr>
+		  <td>  
+		  <img src="images/add.png" width="35" height="35" class="lookButton" id="newNomina" data-toggle="tooltip"/>
+		  </td>
+		  <td>
+			<div id="menu" data-ng-repeat="e in lstListNomina" data-ng-click="toggleObject.item = $index" 
+			               data-ng-class="{'rowActive' : toggleObject.item == $index}" class="tableMenuOptions">
+			   <a href="#" 
+			      ng-click="setSelected(this)">{{e.EmpleadoNombre}}</a>
+		    </div>
+		  </td>
+		  <td>
+			<img src="images/config.png" width="30" height="30" class="lookButton" id="config" data-toggle="tooltip"/>
+			<br><br>
+			<img src="images/adduser.png" width="30" height="30" class="lookButton" id="adduser" data-toggle="tooltip"/>
+			<br><br>
+			<img src="images/stadistics.png" width="30" height="30" class="lookButton" id="stadistics" data-toggle="tooltip"/>
+			<br><br>
+			<img src="images/card.png" width="30" height="20" class="lookButton" id="card" data-toggle="tooltip"/>
+		  </td>
+		</tr>
+	  </table>
+    </div>
+    <div class="col-sm-8" style="border-width:0px; border-style:solid; border-color:blue; padding:0px 0px 0px 8px">
+	    <table id="tblIndex" ng-if="lstNomina.length" datatable-setup class="dgvMain">
+		<tbody ng-repeat="n in lstNomina" data-ng-click="toggleObject1.item1 = $index">
+			<tr data-toggle="collapse" data-target="#{{n.EmpleadoID}}" on-finish-render 
+			    data-ng-class="{'highlight' : toggleObject1.item1 == $index}" class="employeeRow" >
+				<td>{{n.EmpleadoNombre}}</td>
+				<td>{{n.EmpleadoPercepciones}}</td>
+				<td>{{n.EmpleadoDeducciones}}</td>
+				<td>{{n.EmpleadoHorasExtra}}</td>
+				<td>{{n.EmpleadoStatusTimbre}}</td>
+				<td class="hide">{{n.EmpleadoID}}</td>
+			</tr>
+			<tr id="{{n.EmpleadoID}}" class="hiddenRow collapse">
+                <td colspan="1" align="center" valign="top" style="border:0px black solid;">
+					   <table class="tablePercepciones">
+						<thead>
+							<tr>
+								<th colspan="2">
+								   <a href="#" class="linkStyle" data-toggle="modal" data-target="#wndPercepciones">EDITAR PERCEPCIONES</a>
+								</th>
+							</tr>
+						</thead>
+						<tbody ng-repeat="p in lstPercepciones">
+							<tr>
+								<td>{{p.EmpleadoPercepcionesNombre}}</td>
+								<td>{{p.EmpleadoPercepcionesMonto}}</td>
+							</tr>
+						</tbody>
+					   </table>
+                </td>
+				<td colspan="2" align="center" valign="top" style="border:0px black solid;">
+					<table class="tableDeducciones">
+						<thead>
+							<tr>
+								<th colspan="2">
+								<a href="#" class="linkStyle" data-toggle="modal" data-target="#wndDeducciones">EDITAR DEDUCCIONES</a>
+								</th>
+							</tr>
+						</thead>
+						<tbody ng-repeat="d in lstDeducciones">
+							<tr>
+								<td>{{d.EmpleadoDeduccionesNombre}}</td>
+								<td>{{d.EmpleadoDeduccionesMonto}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+				<td colspan="1" align="center" valign="top" style="border:0px black solid;">
+					<table class="tableSimbolsParent">
+						<tbody>
+							<tr>
+								<td>Horas Extra dobles</td>
+							</tr>
+							<tr>
+							    <td>
+							    <table class="tableSimbols">
+									<tbody>
+										<tr>
+											<td class="minus" data-toggle="tooltip">-</td>
+											<td class="NumberHours">5</td>
+											<td class="plus" data-toggle="tooltip"/>+</td>
+										</tr>
+									</tbody>
+								</table>
+								</td>
+							</tr>
+							<tr>
+								<td>Horas Domingos laborados</td>
+							</tr>
+							<tr>
+							    <td>
+							    <table class="tableSimbols">
+									<tbody>
+										<tr>
+											<td class="minus" data-toggle="tooltip">-</td>
+											<td class="NumberHours">5</td>
+											<td class="plus" data-toggle="tooltip"/>+</td>
+										</tr>
+									</tbody>
+								</table>
+								</td>
+							</tr>
+							<tr>
+								<td>Incapacidades</td>
+							</tr>
+							<tr>
+							    <td>
+							    <table class="tableSimbols">
+									<tbody>
+										<tr>
+											<td class="minus" data-toggle="tooltip">-</td>
+											<td class="NumberHours">5</td>
+											<td class="plus" data-toggle="tooltip"/>+</td>
+										</tr>
+									</tbody>
+								</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+				<td colspan="1" align="center" valign="top" style="border:0px black solid;">
+					<table class="tableSimbolsParent">
+						<tbody>
+							<tr>
+								<td>Horas Extra triples</td>
+							</tr>
+							<tr>
+							    <td>
+							    <table class="tableSimbols">
+									<tbody>
+										<tr>
+											<td class="minus" data-toggle="tooltip">-</td>
+											<td class="NumberHours">5</td>
+											<td class="plus" data-toggle="tooltip"/>+</td>
+										</tr>
+									</tbody>
+								</table>
+								</td>
+							</tr>
+							<tr>
+								<td>Faltas</td>
+							</tr>
+							<tr>
+							    <td>
+							    <table class="tableSimbols">
+									<tbody>
+										<tr>
+											<td class="minus" data-toggle="tooltip">-</td>
+											<td class="NumberHours">5</td>
+											<td class="plus" data-toggle="tooltip"/>+</td>
+										</tr>
+									</tbody>
+								</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				 </td>
+            </tr>
+		</tbody>
+	  </table>
+      
+	</div>
+    <div class="col-sm-1" style="border-width:0px; border-style:solid; border-color:pink;">
+	  <div class="row">
+      <br>
+	  <img src="images/man.png" width="30" height="30" id="empleado" class="lookButton" data-toggle="tooltip"/>
+	  <br>
+	  <br>
+	  <img src="images/card.png" width="30" height="20" id="cardEmpleado" class="lookButton" data-toggle="tooltip"/>
+	  <br>
+	  <br>
+	  <img src="images/eye.png" width="30" height="30" id="visualizar" class="lookButton" data-toggle="tooltip"/>
+	  </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Contenido de Modal Percepciones -->
+<div id="wndPercepciones" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Percepciones</h4>
+      </div>
+      <div class="modal-body">
+        <p>Some text in the modal.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Contenido de Modal Deducciones -->
+<div id="wndDeducciones" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Deducciones</h4>
+      </div>
+      <div class="modal-body">
+        <p>Some text in the modal.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
   </body>
 </html>
